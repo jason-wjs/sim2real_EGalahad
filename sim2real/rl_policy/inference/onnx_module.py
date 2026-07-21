@@ -28,6 +28,9 @@ def _normalize_output_name(name: str):
         key = key[: -len("_orig")]
     if key.startswith("next_"):
         return ("next", key[len("next_") :])
+    # Some external exports (e.g. TeleopIT) use plural "actions".
+    if key == "actions":
+        return "action"
     return key
 
 

@@ -28,6 +28,9 @@ Run all commands from the `sim2real/` repository root.
     plots, but use `run_tracking_metrics_eval.py` for new tracking comparisons.
 - `convert_xrobot_raw_zip_to_any4hdmi.py`
   - Converts XRobot raw G1 motion dumps into any4hdmi `.npz` motion files.
+- `convert_mjlab_g1_native_to_any4hdmi.py`
+  - Converts `mjlab_g1_native` / `isaaclab_g1` NPZ motions (single file or
+    directory tree) into an any4hdmi dataset (`motions/` + `manifest.json`).
 - `visualize_root_trajectory.py` and `plot_root_final_error_bars.py`
   - Helpers for inspecting root trajectories and old root-final-error outputs.
 
@@ -146,3 +149,49 @@ uv run python scripts/tracking_experiment/run_root_final_error_eval.py \
 This path writes root-only trajectories and computes
 `root_final_error_norm` / `root_final_error_xy_norm`; it does not compute
 motion progress or local body tracking.
+
+## Convert mjlab_g1_native Motions
+
+`convert_mjlab_g1_native_to_any4hdmi.py` turns IsaacLab / mjlab G1 native NPZ
+clips into an any4hdmi qpos dataset. Pass either one `.npz` or a directory.
+
+Single file:
+
+```bash
+uv run --no-sync python scripts/tracking_experiment/convert_mjlab_g1_native_to_any4hdmi.py \
+  --input /path/to/motion.npz \
+  --out-dir outputs/any4hdmi_datasets/example_clip \
+  --dataset-name example_clip
+```
+
+Directory (optional smoke with `--max-files`):
+
+```bash
+uv run --no-sync python scripts/tracking_experiment/convert_mjlab_g1_native_to_any4hdmi.py \
+  --input /path/to/amass_filtered_0.05_40k-segmented_2k \
+  --out-dir outputs/any4hdmi_datasets/amass_filtered_0.05_40k-segmented_2k \
+  --dataset-name amass_filtered_0.05_40k-segmented_2k \
+  --skip-existing \
+  --continue-on-error
+```
+
+Useful flags: `--body-quat-order {wxyz,xyzw}`, `--max-files N`,
+`--reference-manifest <any4hdmi/manifest.json>`.
+
+After conversion, point offline replay or batch eval at the output motions:
+
+```bash
+export ANY4HDMI_CACHE_BUILD_DEVICE=cpu
+uv run --no-sync python -m sim2real.sim_env.integrated_sim2sim \
+  --robot g1 \
+  --policy-config checkpoints/twist2/policy.yaml \
+  --motion-path outputs/any4hdmi_datasets/example_clip/motions/motion.npz \
+  --headless --run-once --initial-pause-s 1.0 --inference-backend onnx-cpu
+
+uv run --no-sync python scripts/tracking_experiment/run_tracking_metrics_eval.py \
+  --motions-root outputs/any4hdmi_datasets/amass_filtered_0.05_40k-segmented_2k \
+  --policy twist2=checkpoints/twist2/policy.yaml \
+  --num-motions 8 \
+  --seeds 0 \
+  --output-dir outputs/tracking_eval/amass_smoke
+```
