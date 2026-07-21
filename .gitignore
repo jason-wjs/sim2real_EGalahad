@@ -45,3 +45,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Local any4hdmi motion datasets for offline eval
+/motions/
