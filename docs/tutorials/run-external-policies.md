@@ -22,6 +22,7 @@ value.
 | --- | --- | --- |
 | HEFT PMG | `checkpoints/heft/pmg/policy.yaml` | Normal G1 motion stream. |
 | HEFT Compliance | `checkpoints/heft/compliance/policy.yaml` | Normal G1 motion stream; compliance flag is forced off in the observation. |
+| HEFT WUJS | `checkpoints/heft/wujs/policy.yaml` | Normal G1 motion stream; uses the standard HEFT observation contract and was trained on the WUJS dataset. |
 | TeleopIT | `checkpoints/teleopit/policy.yaml` | Normal G1 motion stream. |
 | Humanoid-GPT | `checkpoints/humanoid-gpt/policy.yaml` | Normal G1 motion stream. |
 | BFM-Zero | `checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.yaml` | Requires the checkpoint-specific MJCF override for ZMQ publishers. |

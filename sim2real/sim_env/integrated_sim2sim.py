@@ -887,6 +887,10 @@ class IntegratedSim2Sim:
         self._trajectory_body_names: list[str] | None = None
         self._trajectory_robot_body_ids: list[int] | None = None
         self._trajectory_motion_body_indices: list[int] | None = None
+        self._trajectory_joint_names: list[str] | None = None
+        self._trajectory_robot_joint_qpos_adrs: list[int] | None = None
+        self._trajectory_robot_joint_qvel_adrs: list[int] | None = None
+        self._trajectory_motion_joint_indices: list[int] | None = None
         self._last_trajectory_motion_t: int | None = None
         self._tracking_failure_counts = {
             "root_ori_error": 0,
@@ -1016,11 +1020,9 @@ class IntegratedSim2Sim:
         if self._trajectory_body_names is not None:
             return
         state_processor = self.state_processor
-        configured_body_names = list(
-            self.policy.policy_config.get("body_names_simulation")
-            or self.policy.policy_config.get("motion", {}).get("body_names")
-            or state_processor.motion_body_names
-        )
+        # Use the robot definition, rather than a controller-specific body list,
+        # so every controller is evaluated on the same shared body set.
+        configured_body_names = list(self.robot_cfg.body_names)
         body_names: list[str] = []
         robot_body_ids: list[int] = []
         motion_body_indices: list[int] = []
@@ -1041,6 +1043,33 @@ class IntegratedSim2Sim:
         self._trajectory_body_names = body_names
         self._trajectory_robot_body_ids = robot_body_ids
         self._trajectory_motion_body_indices = motion_body_indices
+
+        sim_joint_layout = {
+            int(robot_idx): (int(qpos_addr), int(qvel_addr))
+            for robot_idx, qpos_addr, qvel_addr in zip(
+                self.sim.joint_indices_unitree,
+                self.sim.qpos_adrs,
+                self.sim.qvel_adrs,
+            )
+        }
+        joint_names: list[str] = []
+        robot_joint_qpos_adrs: list[int] = []
+        robot_joint_qvel_adrs: list[int] = []
+        motion_joint_indices: list[int] = []
+        for robot_idx, joint_name in enumerate(self.robot_cfg.joint_names):
+            if robot_idx not in sim_joint_layout or joint_name not in state_processor.motion_joint_names:
+                continue
+            qpos_addr, qvel_addr = sim_joint_layout[robot_idx]
+            joint_names.append(str(joint_name))
+            robot_joint_qpos_adrs.append(qpos_addr)
+            robot_joint_qvel_adrs.append(qvel_addr)
+            motion_joint_indices.append(state_processor.motion_joint_names.index(joint_name))
+        if not joint_names:
+            raise ValueError("Could not resolve any shared robot/motion joints for trajectory output")
+        self._trajectory_joint_names = joint_names
+        self._trajectory_robot_joint_qpos_adrs = robot_joint_qpos_adrs
+        self._trajectory_robot_joint_qvel_adrs = robot_joint_qvel_adrs
+        self._trajectory_motion_joint_indices = motion_joint_indices
 
     @staticmethod
     def _indices_for_patterns(names: list[str], patterns: tuple[str, ...]) -> list[int]:
@@ -1187,6 +1216,9 @@ class IntegratedSim2Sim:
         self._prepare_trajectory_body_layout()
         assert self._trajectory_robot_body_ids is not None
         assert self._trajectory_motion_body_indices is not None
+        assert self._trajectory_robot_joint_qpos_adrs is not None
+        assert self._trajectory_robot_joint_qvel_adrs is not None
+        assert self._trajectory_motion_joint_indices is not None
         motion_data = self._motion_frame(motion_t)
         robot_body_pos_w = np.asarray(
             self.sim.mj_data.xpos[self._trajectory_robot_body_ids],
@@ -1204,6 +1236,22 @@ class IntegratedSim2Sim:
             motion_data.body_quat_w[0, 0, self._trajectory_motion_body_indices],
             dtype=np.float32,
         ).copy()
+        robot_joint_pos = np.asarray(
+            self.sim.mj_data.qpos[self._trajectory_robot_joint_qpos_adrs],
+            dtype=np.float32,
+        ).copy()
+        robot_joint_vel = np.asarray(
+            self.sim.mj_data.qvel[self._trajectory_robot_joint_qvel_adrs],
+            dtype=np.float32,
+        ).copy()
+        motion_joint_pos = np.asarray(
+            motion_data.joint_pos[0, 0, self._trajectory_motion_joint_indices],
+            dtype=np.float32,
+        ).copy()
+        motion_joint_vel = np.asarray(
+            motion_data.joint_vel[0, 0, self._trajectory_motion_joint_indices],
+            dtype=np.float32,
+        ).copy()
         self.trajectory.append(
             {
                 **root_frame,
@@ -1211,6 +1259,10 @@ class IntegratedSim2Sim:
                 "robot_body_quat_w": robot_body_quat_w,
                 "motion_body_pos_w": motion_body_pos_w,
                 "motion_body_quat_w": motion_body_quat_w,
+                "robot_joint_pos": robot_joint_pos,
+                "robot_joint_vel": robot_joint_vel,
+                "motion_joint_pos": motion_joint_pos,
+                "motion_joint_vel": motion_joint_vel,
             }
         )
         self._update_tracking_failure_state(
@@ -1310,6 +1362,7 @@ class IntegratedSim2Sim:
         output_path = Path(self.args.trajectory_output).expanduser()
         output_path.parent.mkdir(parents=True, exist_ok=True)
         assert self._trajectory_body_names is not None
+        assert self._trajectory_joint_names is not None
 
         np.savez_compressed(
             output_path,
@@ -1346,6 +1399,23 @@ class IntegratedSim2Sim:
                 axis=0,
             ),
             body_names=np.asarray(self._trajectory_body_names),
+            robot_joint_pos=np.stack(
+                [frame["robot_joint_pos"] for frame in self.trajectory],
+                axis=0,
+            ),
+            robot_joint_vel=np.stack(
+                [frame["robot_joint_vel"] for frame in self.trajectory],
+                axis=0,
+            ),
+            motion_joint_pos=np.stack(
+                [frame["motion_joint_pos"] for frame in self.trajectory],
+                axis=0,
+            ),
+            motion_joint_vel=np.stack(
+                [frame["motion_joint_vel"] for frame in self.trajectory],
+                axis=0,
+            ),
+            joint_names=np.asarray(self._trajectory_joint_names),
             sim_time=np.asarray(
                 [frame["sim_time"] for frame in self.trajectory],
                 dtype=np.float32,

@@ -35,4 +35,17 @@ uv run scripts/view_motion.py \
   --motion g1_motion_YYYYMMDD_HHMMSS/motions/motion.npz
 ```
 
+The default backend is the native MuJoCo viewer. For remote browser-based
+reference inspection, use Viser and loop the clip:
+
+```bash
+uv run scripts/view_motion.py \
+  --motion g1_motion_YYYYMMDD_HHMMSS/motions/motion.npz \
+  --viewer viser \
+  --loop
+```
+
+The Viser backend prints its URL, waits for the first browser client before
+playback, and stops on `Ctrl-C`. Without `--loop`, it holds the last frame.
+
 The live retarget viewer is built into `sim2real/teleop/pico_retarget_pub.py`. It does not replay recorded `.npz` files.

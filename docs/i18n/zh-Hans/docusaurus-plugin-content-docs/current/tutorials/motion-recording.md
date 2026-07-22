@@ -32,4 +32,17 @@ uv run scripts/view_motion.py \
   --motion g1_motion_YYYYMMDD_HHMMSS/motions/motion.npz
 ```
 
+默认 backend 是原生 MuJoCo viewer。远程通过浏览器检查纯 reference 时，
+使用 Viser 并循环播放：
+
+```bash
+uv run scripts/view_motion.py \
+  --motion g1_motion_YYYYMMDD_HHMMSS/motions/motion.npz \
+  --viewer viser \
+  --loop
+```
+
+Viser backend 会打印访问地址，并等待首个浏览器客户端连接后再开始播放；
+按 `Ctrl-C` 结束。不加 `--loop` 时会停在最后一帧。
+
 实时 retarget viewer 已经内置在 `sim2real/teleop/pico_retarget_pub.py` 里；它不回放录好的 `.npz` 文件。

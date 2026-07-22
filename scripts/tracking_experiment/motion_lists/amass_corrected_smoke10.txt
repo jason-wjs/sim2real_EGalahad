@@ -1,0 +1,12 @@
+# AMASS-corrected smoke subset: 10 sources, 0.02 s timestep.
+# Frames: 180, 604, 272, 194, 222, 205, 1736, 1514, 370, 1237.
+outputs/any4hdmi_datasets/amass_corrected/motions/ACCAD/Male2MartialArtsKicks_c3d/G11-  roundhouse leading right_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/BMLhandball/S06_Novice/Trial_upper_left_129_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/BMLmovi/Subject_51_F_MoSh/Subject_51_F_8_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/BioMotionLab_NTroje/rub061/0008_normal_walk4_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/CMU/22_23_justin/22_06_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/DFaust_67/50020/50020_shake_hips_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/DanceDB/20140526_StephanosKoullapis/StefanosKoullapis_Reggaeton_C3D_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/Eyes_Japan_Dataset/kaiwa/pose-18-applause-kaiwa_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/KIT/378/push_recovery_right09_poses/motion_seg1/motion.npz
+outputs/any4hdmi_datasets/amass_corrected/motions/MPI_HDM05/dg/HDM_dg_05-01_01_120_poses/motion_seg1/motion.npz

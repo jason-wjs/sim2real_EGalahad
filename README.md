@@ -49,7 +49,7 @@ folder.
 Currently supported adapted checkpoint families:
 
 - BFM-Zero: `checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.yaml`
-- HEFT: `checkpoints/heft/pmg/policy.yaml`, `checkpoints/heft/compliance/policy.yaml`
+- HEFT: `checkpoints/heft/pmg/policy.yaml`, `checkpoints/heft/compliance/policy.yaml`, `checkpoints/heft/wujs/policy.yaml`
 - Humanoid-GPT: `checkpoints/humanoid-gpt/policy.yaml`
 - SONIC release G1: `checkpoints/sonic/release/g1/policy.yaml`
 - SONIC release SMPL: `checkpoints/sonic/release/smpl/policy.yaml`

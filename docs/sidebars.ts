@@ -66,6 +66,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'doc',
+          id: 'tracking_metrics_diff',
+          label: 'Unified Tracking Metrics',
+        },
+        {
+          type: 'doc',
           id: 'pico_to_g1',
           label: 'Pico To G1',
         },
