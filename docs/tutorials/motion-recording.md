@@ -48,4 +48,18 @@ uv run scripts/view_motion.py \
 The Viser backend prints its URL, waits for the first browser client before
 playback, and stops on `Ctrl-C`. Without `--loop`, it holds the last frame.
 
+To browse every clip in an any4hdmi dataset, pass its dataset root instead of a
+single motion:
+
+```bash
+uv run scripts/view_motion.py \
+  --dataset outputs/any4hdmi_datasets/amass_corrected \
+  --viewer viser \
+  --loop
+```
+
+Use the `Motion dataset` folder in the Viser sidebar to select a motion or move
+to the previous or next one. Each selection restarts playback from the selected
+clip's first included frame.
+
 The live retarget viewer is built into `sim2real/teleop/pico_retarget_pub.py`. It does not replay recorded `.npz` files.

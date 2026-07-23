@@ -45,4 +45,17 @@ uv run scripts/view_motion.py \
 Viser backend 会打印访问地址，并等待首个浏览器客户端连接后再开始播放；
 按 `Ctrl-C` 结束。不加 `--loop` 时会停在最后一帧。
 
+如需浏览一个 any4hdmi 数据集中的所有 motion，可传入 dataset root，而不是
+单条 motion：
+
+```bash
+uv run scripts/view_motion.py \
+  --dataset outputs/any4hdmi_datasets/amass_corrected \
+  --viewer viser \
+  --loop
+```
+
+在 Viser 侧栏的 `Motion dataset` 中，可以直接选择 motion，或切换到上一条、
+下一条。每次选择都会从该 motion 所包含的第一帧重新开始播放。
+
 实时 retarget viewer 已经内置在 `sim2real/teleop/pico_retarget_pub.py` 里；它不回放录好的 `.npz` 文件。

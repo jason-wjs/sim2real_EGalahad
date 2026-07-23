@@ -101,6 +101,14 @@ class ConvertToAny4HdmiTest(unittest.TestCase):
         self.assertEqual(motion.shape, (3, 36))
         np.testing.assert_allclose(motion[:, :3], [[0.0, 0.0, 0.8], [1.0, 0.0, 0.8], [2.0, 0.0, 0.8]])
         np.testing.assert_allclose(motion[:, 3:7], [[1.0, 0.0, 0.0, 0.0]] * 3)
+        source_joint_pos = np.arange(3 * 29, dtype=np.float32).reshape(3, 29) / 100.0
+        source_index = {
+            name: index for index, name in enumerate(converter.ISAACLAB_G1_JOINT_NAMES)
+        }
+        expected_joint_pos = source_joint_pos[
+            :, [source_index[name] for name in G1_CFG.joint_names]
+        ]
+        np.testing.assert_allclose(motion[:, 7:], expected_joint_pos)
 
         resume_args = [*self._base_args(source, output, "isaaclab"), "--skip-existing"]
         self.assertEqual(converter.main(resume_args), 0)

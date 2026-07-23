@@ -212,6 +212,26 @@ metrics; budget storage per policy and seed before a large run.
 `isaaclab` and `mujoco` are CLI aliases for the corresponding concrete
 formats.
 
+### Inspect corrected source motions directly
+
+Use the diagnostic Viser before conversion when source body transforms need to
+be compared with the MuJoCo reconstruction produced by the current converter.
+It selects only the first five motions by default and lazily loads the selected
+clip:
+
+```bash
+uv run --no-sync python scripts/view_raw_motion.py \
+  --input /path/to/amass_filtered_0.05_40k-segmented_2k \
+  --num-motions 5 \
+  --loop
+```
+
+The magenta points, skeleton, and axes are the source
+`body_pos_w/body_quat_w` values. The robot mesh is reconstructed from the
+source pelvis pose and `joint_pos` using the exact assumptions in
+`convert_to_any4hdmi.py`. The sidebar reports aggregate FK mismatch for
+the selected clip.
+
 Single file:
 
 ```bash

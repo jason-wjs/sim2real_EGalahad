@@ -31,36 +31,67 @@ SOURCE_FORMAT_ALIASES = {
 }
 EXPECTED_DOF = 29
 EXPECTED_BODY_COUNT = 30
+ISAACLAB_G1_JOINT_NAMES = (
+    "left_hip_pitch_joint",
+    "right_hip_pitch_joint",
+    "waist_yaw_joint",
+    "left_hip_roll_joint",
+    "right_hip_roll_joint",
+    "waist_roll_joint",
+    "left_hip_yaw_joint",
+    "right_hip_yaw_joint",
+    "waist_pitch_joint",
+    "left_knee_joint",
+    "right_knee_joint",
+    "left_shoulder_pitch_joint",
+    "right_shoulder_pitch_joint",
+    "left_ankle_pitch_joint",
+    "right_ankle_pitch_joint",
+    "left_shoulder_roll_joint",
+    "right_shoulder_roll_joint",
+    "left_ankle_roll_joint",
+    "right_ankle_roll_joint",
+    "left_shoulder_yaw_joint",
+    "right_shoulder_yaw_joint",
+    "left_elbow_joint",
+    "right_elbow_joint",
+    "left_wrist_roll_joint",
+    "right_wrist_roll_joint",
+    "left_wrist_pitch_joint",
+    "right_wrist_pitch_joint",
+    "left_wrist_yaw_joint",
+    "right_wrist_yaw_joint",
+)
 ISAACLAB_G1_BODY_NAMES = (
     "pelvis",
     "left_hip_pitch_link",
-    "left_hip_roll_link",
-    "left_hip_yaw_link",
-    "left_knee_link",
-    "left_ankle_pitch_link",
-    "left_ankle_roll_link",
     "right_hip_pitch_link",
-    "right_hip_roll_link",
-    "right_hip_yaw_link",
-    "right_knee_link",
-    "right_ankle_pitch_link",
-    "right_ankle_roll_link",
     "waist_yaw_link",
+    "left_hip_roll_link",
+    "right_hip_roll_link",
     "waist_roll_link",
+    "left_hip_yaw_link",
+    "right_hip_yaw_link",
     "torso_link",
+    "left_knee_link",
+    "right_knee_link",
     "left_shoulder_pitch_link",
-    "left_shoulder_roll_link",
-    "left_shoulder_yaw_link",
-    "left_elbow_link",
-    "left_wrist_roll_link",
-    "left_wrist_pitch_link",
-    "left_wrist_yaw_link",
     "right_shoulder_pitch_link",
+    "left_ankle_pitch_link",
+    "right_ankle_pitch_link",
+    "left_shoulder_roll_link",
     "right_shoulder_roll_link",
+    "left_ankle_roll_link",
+    "right_ankle_roll_link",
+    "left_shoulder_yaw_link",
     "right_shoulder_yaw_link",
+    "left_elbow_link",
     "right_elbow_link",
+    "left_wrist_roll_link",
     "right_wrist_roll_link",
+    "left_wrist_pitch_link",
     "right_wrist_pitch_link",
+    "left_wrist_yaw_link",
     "right_wrist_yaw_link",
 )
 CORRECTED_REQUIRED_KEYS = (
@@ -235,6 +266,31 @@ def _validate_joint_and_body_arrays(
     _validate_finite("body_pos_w", body_pos_w)
 
 
+def _joint_pos_in_qpos_order(
+    joint_pos: np.ndarray,
+    *,
+    source_joint_names: tuple[str, ...],
+    qpos_names: list[str],
+) -> np.ndarray:
+    target_joint_names = qpos_names[7:]
+    if len(source_joint_names) != joint_pos.shape[1]:
+        raise ValueError(
+            f"Expected {joint_pos.shape[1]} source joint names, got {len(source_joint_names)}"
+        )
+    if len(set(source_joint_names)) != len(source_joint_names):
+        raise ValueError("Source joint names contain duplicates")
+    if len(set(target_joint_names)) != len(target_joint_names):
+        raise ValueError("Target qpos joint names contain duplicates")
+    if set(source_joint_names) != set(target_joint_names):
+        missing = sorted(set(target_joint_names) - set(source_joint_names))
+        extra = sorted(set(source_joint_names) - set(target_joint_names))
+        raise ValueError(
+            f"Source and target joint names differ: missing={missing}, extra={extra}"
+        )
+    source_index = {name: index for index, name in enumerate(source_joint_names)}
+    return joint_pos[:, [source_index[name] for name in target_joint_names]]
+
+
 def _build_qpos(
     *,
     path: Path,
@@ -294,6 +350,11 @@ def _load_isaaclab_corrected(
     sidecar_fps = sidecar.get("fps")
     if sidecar_fps is not None and not np.isclose(float(sidecar_fps), fps):
         raise ValueError(f"{path}: sidecar fps={sidecar_fps} != NPZ fps={fps}")
+    joint_pos = _joint_pos_in_qpos_order(
+        joint_pos,
+        source_joint_names=ISAACLAB_G1_JOINT_NAMES,
+        qpos_names=qpos_names,
+    )
     qpos = _build_qpos(
         path=path,
         joint_pos=joint_pos,
