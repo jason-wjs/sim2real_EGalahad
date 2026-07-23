@@ -76,7 +76,22 @@ def _parse_args() -> argparse.Namespace:
         default=100,
         help="Checkpoint runs.csv and print progress every N rollouts.",
     )
+    parser.add_argument(
+        "--allow-network-assets",
+        action="store_true",
+        help=(
+            "Allow rollout subprocesses to fetch Hugging Face assets. Batch evaluation "
+            "is offline by default so missing runtime artifacts fail deterministically."
+        ),
+    )
     return parser.parse_args()
+
+
+def _configure_asset_network(*, allow_network_assets: bool) -> None:
+    if allow_network_assets:
+        os.environ.pop("HF_HUB_OFFLINE", None)
+        return
+    os.environ["HF_HUB_OFFLINE"] = "1"
 
 
 def _policy_map(items: list[str]) -> dict[str, str]:
@@ -312,6 +327,9 @@ def _add_policy_summary(
 
 def main() -> None:
     args = _parse_args()
+    _configure_asset_network(
+        allow_network_assets=bool(getattr(args, "allow_network_assets", False))
+    )
     if args.num_motions is not None and args.num_motions <= 0:
         raise ValueError("--num-motions must be positive")
     if args.checkpoint_every <= 0:

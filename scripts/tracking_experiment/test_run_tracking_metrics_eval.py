@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import tempfile
 import unittest
 from argparse import Namespace
@@ -14,6 +15,16 @@ import run_tracking_metrics_eval as evaluator
 
 
 class RunTrackingMetricsEvalTest(unittest.TestCase):
+    def test_batch_eval_disables_hugging_face_network_by_default(self) -> None:
+        with patch.dict(os.environ, {"HF_HUB_OFFLINE": "0"}, clear=False):
+            evaluator._configure_asset_network(allow_network_assets=False)
+            self.assertEqual(os.environ["HF_HUB_OFFLINE"], "1")
+
+    def test_network_assets_can_be_explicitly_allowed(self) -> None:
+        with patch.dict(os.environ, {"HF_HUB_OFFLINE": "1"}, clear=False):
+            evaluator._configure_asset_network(allow_network_assets=True)
+            self.assertNotIn("HF_HUB_OFFLINE", os.environ)
+
     def test_motion_paths_default_to_all_and_allow_limit(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

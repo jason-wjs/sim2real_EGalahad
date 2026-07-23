@@ -1,6 +1,32 @@
 from __future__ import annotations
 
-from sim2real.config.robots.base import RobotCfg
+import hashlib
+from pathlib import Path
+
+from sim2real.config.robots.base import PROJECT_ROOT, RobotCfg
+
+
+G1_MJCF_SOURCE_URI = (
+    "hf://elijahgalahad/g1_xmls@a57ffbdfc0a9379a781f37f4513a82b92ea93591/"
+    "g1-mode_13_15.xml"
+)
+G1_MJCF_LOCAL_PATH = PROJECT_ROOT / "third_party/prebuilt/g1_xmls/g1-mode_13_15.xml"
+G1_MJCF_SHA256 = "29a7ad71803d37d09f564bb1c9ae15e348a8c82b815c5d1ccbdde3f2f0521513"
+
+
+def _select_g1_mjcf_reference(local_path: Path = G1_MJCF_LOCAL_PATH) -> str:
+    local_path = local_path.expanduser()
+    if not local_path.is_file():
+        return str(local_path.resolve())
+
+    actual_sha256 = hashlib.sha256(local_path.read_bytes()).hexdigest()
+    if actual_sha256 != G1_MJCF_SHA256:
+        raise RuntimeError(
+            "Local G1 MJCF does not match the pinned runtime asset: "
+            f"path={local_path} expected_sha256={G1_MJCF_SHA256} "
+            f"actual_sha256={actual_sha256}"
+        )
+    return str(local_path.resolve())
 
 
 def reflected_inertia_from_two_stage_planetary(
@@ -265,7 +291,7 @@ G1_CFG = RobotCfg(
     },
     joint_armature=G1_MODE_15_JOINT_ARMATURE,
     joint_frictionloss=G1_MODE_15_JOINT_FRICTIONLOSS,
-    mjcf_path="hf://elijahgalahad/g1_xmls@main/g1-mode_13_15.xml",
+    mjcf_path=_select_g1_mjcf_reference(),
     default_qpos=(
         0.0,
         0.0,

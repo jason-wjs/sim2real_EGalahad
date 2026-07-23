@@ -268,6 +268,16 @@ ANY4HDMI_CACHE_BUILD_DEVICE=cpu uv run --no-sync python \
 `checkpoints/heft/wujs/policy.yaml`。controller alias 只是标签，其书写顺序
 不会产生排名。
 
+正式 batch 评测默认离线运行：runner 会向 rollout 子进程设置
+`HF_HUB_OFFLINE=1`，并使用 `third_party/prebuilt/g1_xmls/` 中经过 checksum
+固定的 G1 资源。policy 专属的 `motion.mjcf_path` 仍然具有最高优先级；
+`--allow-network-assets` 只是显式的诊断或初次准备开关。
+
+把资源从远程 URI/cache 移到字节完全相同的本地路径，不会使已完成 metrics
+失效。应保留现有 checkpoint，只补跑失败或缺失的 rollout key。只有
+MJCF/mesh 内容、policy checkpoint/config、motion 数据、simulator 设置、
+trajectory schema 或 metrics 实现发生变化时，才需要完整重跑。
+
 完整命令使用 `--retention summary-only`：每条 rollout 结束后立即计算
 标量 metrics，持久追加到 `checkpoints/rollout_metrics.jsonl`，再删除已成功
 计算 metrics 的 trajectory。正常到达 motion end 的日志会删除；tracking

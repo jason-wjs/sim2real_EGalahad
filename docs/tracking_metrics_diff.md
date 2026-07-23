@@ -286,6 +286,18 @@ ANY4HDMI_CACHE_BUILD_DEVICE=cpu uv run --no-sync python \
 Use `checkpoints/heft/wujs/policy.yaml` instead if that is the intended HEFT
 variant. Controller aliases are labels only; no ranking follows their order.
 
+Formal batch evaluation is offline by default: the runner exports
+`HF_HUB_OFFLINE=1` to rollout subprocesses and uses the checksum-pinned G1
+asset from `third_party/prebuilt/g1_xmls/`. A policy-specific
+`motion.mjcf_path` remains authoritative. `--allow-network-assets` is an
+explicit diagnostic/bootstrap escape hatch.
+
+Moving an asset from a remote URI/cache to a byte-identical local path does
+not invalidate completed metrics. Preserve existing checkpoints and rerun only
+failed or missing rollout keys. A complete rerun is required only when the
+MJCF/mesh contents, policy checkpoint/configuration, motion data, simulator
+settings, trajectory schema, or metric implementation changes.
+
 The full command uses `--retention summary-only`: after each rollout, the
 runner computes its scalar metrics, durably appends them to
 `checkpoints/rollout_metrics.jsonl`, and deletes the successfully processed

@@ -101,6 +101,16 @@ def _prepare_integrated_policy_config(
     return policy_config
 
 
+def _resolve_motion_mjcf_path(
+    robot_cfg: RobotCfg,
+    motion_config: dict[str, Any],
+) -> str | Path:
+    policy_mjcf_path = motion_config.get("mjcf_path")
+    if policy_mjcf_path is not None:
+        return policy_mjcf_path
+    return robot_cfg.resolve_mjcf_path()
+
+
 class IntegratedMotionState:
     def __init__(self, robot_cfg: RobotCfg, policy_config: dict[str, Any]):
         self.robot_cfg = robot_cfg
@@ -142,7 +152,7 @@ class IntegratedMotionState:
         self.motion_dataset = MotionDataset.create_from_path(
             motion_path,
             robot_cfg=self.robot_cfg,
-            mjcf_path=self.motion_config.get("mjcf_path"),
+            mjcf_path=_resolve_motion_mjcf_path(self.robot_cfg, self.motion_config),
         )
         self.motion_dataset = motion_dataset_first_motion(self.motion_dataset)
         if self.motion_dataset.num_motions != 1:
