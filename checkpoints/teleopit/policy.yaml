@@ -1,0 +1,249 @@
+joint_names_simulation: &g1_joint_names
+  - left_hip_pitch_joint
+  - left_hip_roll_joint
+  - left_hip_yaw_joint
+  - left_knee_joint
+  - left_ankle_pitch_joint
+  - left_ankle_roll_joint
+  - right_hip_pitch_joint
+  - right_hip_roll_joint
+  - right_hip_yaw_joint
+  - right_knee_joint
+  - right_ankle_pitch_joint
+  - right_ankle_roll_joint
+  - waist_yaw_joint
+  - waist_roll_joint
+  - waist_pitch_joint
+  - left_shoulder_pitch_joint
+  - left_shoulder_roll_joint
+  - left_shoulder_yaw_joint
+  - left_elbow_joint
+  - left_wrist_roll_joint
+  - left_wrist_pitch_joint
+  - left_wrist_yaw_joint
+  - right_shoulder_pitch_joint
+  - right_shoulder_roll_joint
+  - right_shoulder_yaw_joint
+  - right_elbow_joint
+  - right_wrist_roll_joint
+  - right_wrist_pitch_joint
+  - right_wrist_yaw_joint
+
+body_names_simulation: &g1_body_names
+  - pelvis
+  - left_hip_pitch_link
+  - left_hip_roll_link
+  - left_hip_yaw_link
+  - left_knee_link
+  - left_ankle_pitch_link
+  - left_ankle_roll_link
+  - left_toe_link
+  - right_hip_pitch_link
+  - right_hip_roll_link
+  - right_hip_yaw_link
+  - right_knee_link
+  - right_ankle_pitch_link
+  - right_ankle_roll_link
+  - right_toe_link
+  - waist_yaw_link
+  - waist_roll_link
+  - torso_link
+  - left_shoulder_pitch_link
+  - left_shoulder_roll_link
+  - left_shoulder_yaw_link
+  - left_elbow_link
+  - left_wrist_roll_link
+  - left_wrist_pitch_link
+  - left_wrist_yaw_link
+  - right_shoulder_pitch_link
+  - right_shoulder_roll_link
+  - right_shoulder_yaw_link
+  - right_elbow_link
+  - right_wrist_roll_link
+  - right_wrist_pitch_link
+  - right_wrist_yaw_link
+
+policy_joint_names: *g1_joint_names
+
+teleopit_obs_common: &teleopit_obs_common
+  xml_path: robot_cfg
+  anchor_body_name: torso_link
+  joint_names: *g1_joint_names
+  default_dof_pos: &teleopit_default_dof_pos
+    - -0.312
+    - 0.0
+    - 0.0
+    - 0.669
+    - -0.363
+    - 0.0
+    - -0.312
+    - 0.0
+    - 0.0
+    - 0.669
+    - -0.363
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.2
+    - 0.2
+    - 0.0
+    - 0.6
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.2
+    - -0.2
+    - 0.0
+    - 0.6
+    - 0.0
+    - 0.0
+    - 0.0
+  history_length: 10
+  policy_hz: 50.0
+  align_reference_yaw: true
+
+observation:
+  obs:
+    teleopit_velcmd_obs:
+      _target_: teleopit.teleopit_velcmd_obs
+      <<: *teleopit_obs_common
+  obs_history:
+    teleopit_velcmd_obs_history:
+      _target_: teleopit.teleopit_velcmd_obs_history
+      <<: *teleopit_obs_common
+
+action_clip: 10.0
+action_scale:
+  - 0.5475
+  - 0.3507
+  - 0.5475
+  - 0.3507
+  - 0.4386
+  - 0.4386
+  - 0.5475
+  - 0.3507
+  - 0.5475
+  - 0.3507
+  - 0.4386
+  - 0.4386
+  - 0.5475
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.0745
+  - 0.0745
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.4386
+  - 0.0745
+  - 0.0745
+
+joint_kp:
+  left_hip_pitch_joint: 40.2
+  left_hip_roll_joint: 99.1
+  left_hip_yaw_joint: 40.2
+  left_knee_joint: 99.1
+  left_ankle_pitch_joint: 28.5
+  left_ankle_roll_joint: 28.5
+  right_hip_pitch_joint: 40.2
+  right_hip_roll_joint: 99.1
+  right_hip_yaw_joint: 40.2
+  right_knee_joint: 99.1
+  right_ankle_pitch_joint: 28.5
+  right_ankle_roll_joint: 28.5
+  waist_yaw_joint: 40.2
+  waist_roll_joint: 28.5
+  waist_pitch_joint: 28.5
+  left_shoulder_pitch_joint: 14.3
+  left_shoulder_roll_joint: 14.3
+  left_shoulder_yaw_joint: 14.3
+  left_elbow_joint: 14.3
+  left_wrist_roll_joint: 14.3
+  left_wrist_pitch_joint: 16.8
+  left_wrist_yaw_joint: 16.8
+  right_shoulder_pitch_joint: 14.3
+  right_shoulder_roll_joint: 14.3
+  right_shoulder_yaw_joint: 14.3
+  right_elbow_joint: 14.3
+  right_wrist_roll_joint: 14.3
+  right_wrist_pitch_joint: 16.8
+  right_wrist_yaw_joint: 16.8
+
+joint_kd:
+  left_hip_pitch_joint: 2.6
+  left_hip_roll_joint: 6.3
+  left_hip_yaw_joint: 2.6
+  left_knee_joint: 6.3
+  left_ankle_pitch_joint: 1.8
+  left_ankle_roll_joint: 1.8
+  right_hip_pitch_joint: 2.6
+  right_hip_roll_joint: 6.3
+  right_hip_yaw_joint: 2.6
+  right_knee_joint: 6.3
+  right_ankle_pitch_joint: 1.8
+  right_ankle_roll_joint: 1.8
+  waist_yaw_joint: 2.6
+  waist_roll_joint: 1.8
+  waist_pitch_joint: 1.8
+  left_shoulder_pitch_joint: 0.9
+  left_shoulder_roll_joint: 0.9
+  left_shoulder_yaw_joint: 0.9
+  left_elbow_joint: 0.9
+  left_wrist_roll_joint: 0.9
+  left_wrist_pitch_joint: 1.1
+  left_wrist_yaw_joint: 1.1
+  right_shoulder_pitch_joint: 0.9
+  right_shoulder_roll_joint: 0.9
+  right_shoulder_yaw_joint: 0.9
+  right_elbow_joint: 0.9
+  right_wrist_roll_joint: 0.9
+  right_wrist_pitch_joint: 1.1
+  right_wrist_yaw_joint: 1.1
+
+default_joint_pos:
+  left_hip_pitch_joint: -0.312
+  left_hip_roll_joint: 0.0
+  left_hip_yaw_joint: 0.0
+  left_knee_joint: 0.669
+  left_ankle_pitch_joint: -0.363
+  left_ankle_roll_joint: 0.0
+  right_hip_pitch_joint: -0.312
+  right_hip_roll_joint: 0.0
+  right_hip_yaw_joint: 0.0
+  right_knee_joint: 0.669
+  right_ankle_pitch_joint: -0.363
+  right_ankle_roll_joint: 0.0
+  waist_yaw_joint: 0.0
+  waist_roll_joint: 0.0
+  waist_pitch_joint: 0.0
+  left_shoulder_pitch_joint: 0.2
+  left_shoulder_roll_joint: 0.2
+  left_shoulder_yaw_joint: 0.0
+  left_elbow_joint: 0.6
+  left_wrist_roll_joint: 0.0
+  left_wrist_pitch_joint: 0.0
+  left_wrist_yaw_joint: 0.0
+  right_shoulder_pitch_joint: 0.2
+  right_shoulder_roll_joint: -0.2
+  right_shoulder_yaw_joint: 0.0
+  right_elbow_joint: 0.6
+  right_wrist_roll_joint: 0.0
+  right_wrist_pitch_joint: 0.0
+  right_wrist_yaw_joint: 0.0
+
+motion:
+  motion_path: ../any4hdmi/output/g1/lafan/motions/walk1_subject1.npz
+  future_steps: [0]
+  joint_names: *g1_joint_names
+  body_names: *g1_body_names
+  root_body_name: pelvis
+  anchor_body_name: pelvis
+  motion_backend: npz
+  motion_end_behavior: hold

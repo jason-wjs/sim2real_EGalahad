@@ -15,6 +15,17 @@ _GRAVITY_UNIT_W = np.asarray([0.0, 0.0, -1.0], dtype=np.float32)
 
 
 def _resolve_xml_path(env: Any, xml_path: str) -> Path:
+    if str(xml_path).strip().lower() == "robot_cfg":
+        robot_cfg = getattr(env, "robot_cfg", None)
+        if robot_cfg is None:
+            raise ValueError(
+                "Teleopit xml_path='robot_cfg' requires env.robot_cfg"
+            )
+        # Keep the logical snapshot path intact. Hugging Face cache entries are
+        # symlinks, and resolving the XML to its blob path would break relative
+        # mesh references in the MJCF.
+        return Path(robot_cfg.resolve_mjcf_path()).expanduser().absolute()
+
     path = Path(str(xml_path)).expanduser()
     candidates: list[Path]
     if path.is_absolute():

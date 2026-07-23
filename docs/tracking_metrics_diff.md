@@ -6,10 +6,12 @@ slug: /reference/tracking-metrics-diff
 # Unified Tracking Metrics v2
 
 This document records the metric contract implemented by
-`scripts/tracking_experiment/compute_tracking_metrics.py` and the differences
-from the previous repository metrics, Spider G1 WBC metrics, and SONIC
-evaluation metrics. The target use case is a fair, auditable comparison of
-multiple controllers on the same single motion or motion dataset.
+`sim2real.metrics.tracking`. The compatibility CLI remains at
+`scripts/tracking_experiment/compute_tracking_metrics.py`. It also documents
+the differences from the previous repository metrics, Spider G1 WBC metrics,
+and SONIC evaluation metrics. The target use case is a fair, auditable
+comparison of multiple controllers on the same single motion or motion
+dataset.
 
 The v2 hierarchy is:
 
@@ -105,9 +107,15 @@ because its error is averaged over a short easy prefix.
 
 ## Body and end-effector sets
 
-The recorded body layout now comes from the G1 robot configuration and is
-independent of controller YAML. Metrics use the intersection shared by the
-robot model and reference motion.
+The recorded body layout comes from the G1 robot configuration and is
+independent of controller YAML. Reference FK for trajectory metrics always
+uses the pinned canonical G1 MJCF, even when a controller such as BFM-0 uses a
+policy-specific MJCF for its own observation or reward FK. Metrics use the
+intersection shared by the simulation model and this canonical reference.
+
+The batch evaluator rejects a result if controllers produce different
+key-body, end-effector, or joint layouts; it never silently aggregates
+non-comparable rows.
 
 The key-body patterns select:
 

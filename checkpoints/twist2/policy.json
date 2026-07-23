@@ -1,0 +1,23 @@
+{
+  "in_keys": [
+    "current_motion",
+    "proprioception",
+    "observation_history",
+    "future_motion"
+  ],
+  "out_keys": [
+    "action"
+  ],
+  "in_shapes": [
+    [[1, 35]],
+    [[1, 92]],
+    [[1, 1270]],
+    [[1, 35]]
+  ],
+  "source": {
+    "repo": "https://github.com/amazon-far/TWIST2",
+    "repo_commit": "d5c7108e9ef82d1b8770e5b692f27a1294f3aa8a",
+    "source_path": "assets/ckpts/twist2_1017_20k.onnx",
+    "sha256": "2d1fb3a31e4e967f70ecfefc3ad1e7b2ac491677068b89f60b565a94e7735061"
+  }
+}

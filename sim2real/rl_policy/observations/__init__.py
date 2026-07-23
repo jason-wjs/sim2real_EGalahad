@@ -10,3 +10,4 @@ from .sonic import *
 from .teleopit import *
 from .twist2 import *
 from .velocity import *
+from .wxy_wbc import *

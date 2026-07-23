@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-import compute_tracking_metrics as metrics
+from sim2real.metrics import tracking as metrics
 
 
 class ComputeTrackingMetricsTest(unittest.TestCase):
@@ -70,7 +70,7 @@ class ComputeTrackingMetricsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / "trajectory.npz"
             self._write_trajectory(path, motion_length=10)
-            result = metrics._compute_one(path)
+            result = metrics.compute_trajectory_metrics(path)
         self.assertEqual(result["termination_reason"], "truncated")
         self.assertEqual(result["terminated"], 1)
         self.assertAlmostEqual(result["progress"], 3.0 / 9.0)
@@ -79,10 +79,19 @@ class ComputeTrackingMetricsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp_dir:
             path = Path(temp_dir) / "trajectory.npz"
             self._write_trajectory(path, motion_length=4)
-            result = metrics._compute_one(path)
+            result = metrics.compute_trajectory_metrics(path)
         self.assertEqual(result["termination_reason"], "motion_end")
         self.assertEqual(result["terminated"], 0)
         self.assertEqual(result["progress"], 1.0)
+
+    def test_metric_row_field_order_is_stable(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "trajectory.npz"
+            self._write_trajectory(path, motion_length=4)
+            result = metrics.compute_trajectory_metrics(path)
+
+        self.assertEqual(tuple(result), metrics.METRIC_ROW_FIELDS)
+        self.assertEqual(len(metrics.METRIC_ROW_FIELDS), 64)
 
     def test_root_drift_affects_global_but_not_heading_local_tracking(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -92,7 +101,7 @@ class ComputeTrackingMetricsTest(unittest.TestCase):
                 motion_length=4,
                 robot_root_drift_m=0.1,
             )
-            result = metrics._compute_one(path)
+            result = metrics.compute_trajectory_metrics(path)
 
         self.assertAlmostEqual(result["global_root_pos_xyz_mean_m"], 0.15)
         self.assertAlmostEqual(result["global_key_body_pos_mean_m"], 0.15)
@@ -106,7 +115,7 @@ class ComputeTrackingMetricsTest(unittest.TestCase):
                 motion_length=4,
                 robot_initial_offset_m=2.0,
             )
-            result = metrics._compute_one(path)
+            result = metrics.compute_trajectory_metrics(path)
 
         self.assertAlmostEqual(result["global_root_pos_xyz_mean_m"], 0.0)
         self.assertAlmostEqual(result["global_key_body_pos_mean_m"], 0.0)
@@ -121,7 +130,7 @@ class ComputeTrackingMetricsTest(unittest.TestCase):
                 motion_length=4,
                 robot_joint_vel=joint_vel,
             )
-            result = metrics._compute_one(path)
+            result = metrics.compute_trajectory_metrics(path)
 
         self.assertAlmostEqual(result["joint_jerk_rms_rad_s3"], 2.0, places=4)
 

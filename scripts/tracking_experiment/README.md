@@ -27,6 +27,7 @@ Run all commands from the `sim2real/` repository root.
     scalars, then deletes its trajectory; completed-motion logs are also
     removed, while tracking-termination and execution-failure logs remain.
 - `compute_tracking_metrics.py`
+  - Compatibility CLI for the public `sim2real.metrics` API.
   - Computes outcome, start-aligned global tracking, heading-local tracking,
     joint-space tracking, dynamic tracking, and smoothness from saved
     trajectory `.npz` files.
@@ -45,8 +46,9 @@ Run all commands from the `sim2real/` repository root.
 
 ## Metrics
 
+`sim2real.metrics` provides the reusable Python API, while
 `compute_tracking_metrics.py` reports one detailed row per rollout and
-structured dataset summaries:
+structured dataset summaries from the command line:
 
 - `outcome`: completion, termination/success rate, and termination reasons;
 - `tracking.global_start_aligned`: root, key-body, end-effector, velocity,

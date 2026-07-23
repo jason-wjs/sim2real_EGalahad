@@ -216,7 +216,6 @@ def _any4hdmi_manifest_override_view(
         raise RuntimeError(f"No any4hdmi motion .npz files found under {input_path}")
 
     for source_motion_path in source_motion_paths:
-        source_motion_path = source_motion_path.resolve()
         try:
             motion_relative_path = source_motion_path.relative_to(source_motions)
         except ValueError as exc:

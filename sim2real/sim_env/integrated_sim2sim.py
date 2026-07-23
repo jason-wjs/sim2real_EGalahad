@@ -111,6 +111,23 @@ def _resolve_motion_mjcf_path(
     return robot_cfg.resolve_mjcf_path()
 
 
+def _load_single_motion_dataset(
+    *,
+    motion_path: str,
+    robot_cfg: RobotCfg,
+    mjcf_path: str | Path,
+) -> MotionDataset:
+    dataset = MotionDataset.create_from_path(
+        motion_path,
+        robot_cfg=robot_cfg,
+        mjcf_path=mjcf_path,
+    )
+    dataset = motion_dataset_first_motion(dataset)
+    if dataset.num_motions != 1:
+        raise ValueError("Integrated sim2sim supports one motion per run")
+    return dataset
+
+
 class IntegratedMotionState:
     def __init__(self, robot_cfg: RobotCfg, policy_config: dict[str, Any]):
         self.robot_cfg = robot_cfg
@@ -149,14 +166,11 @@ class IntegratedMotionState:
         motion_path = self.motion_config.get("motion_path")
         if motion_path is None:
             raise ValueError("motion_path is required for integrated sim2sim")
-        self.motion_dataset = MotionDataset.create_from_path(
-            motion_path,
+        self.motion_dataset = _load_single_motion_dataset(
+            motion_path=str(motion_path),
             robot_cfg=self.robot_cfg,
             mjcf_path=_resolve_motion_mjcf_path(self.robot_cfg, self.motion_config),
         )
-        self.motion_dataset = motion_dataset_first_motion(self.motion_dataset)
-        if self.motion_dataset.num_motions != 1:
-            raise ValueError("Integrated sim2sim supports one motion per run")
 
         self.motion_ids = np.array([0], dtype=int)
         self.motion_t = np.array([0], dtype=int)
@@ -886,6 +900,28 @@ class IntegratedSim2Sim:
         self.restart_requested = Event()
         self.robot_cfg = get_robot_cfg(args.robot)
         self.policy = IntegratedPolicyRuntime(args=args, robot_cfg=self.robot_cfg)
+        self.evaluation_motion_dataset = self.policy.state_processor.motion_dataset
+        if args.trajectory_output is not None or args.root_trajectory_output is not None:
+            self.evaluation_motion_dataset = _load_single_motion_dataset(
+                motion_path=args.motion_path,
+                robot_cfg=self.robot_cfg,
+                mjcf_path=self.robot_cfg.resolve_mjcf_path(),
+            )
+            if (
+                self.evaluation_motion_dataset.num_steps
+                != self.policy.state_processor.motion_length
+            ):
+                raise ValueError(
+                    "Policy and evaluation motion datasets disagree on motion length: "
+                    f"{self.policy.state_processor.motion_length} != "
+                    f"{self.evaluation_motion_dataset.num_steps}"
+                )
+        self.evaluation_motion_joint_names = list(
+            self.evaluation_motion_dataset.joint_names
+        )
+        self.evaluation_motion_body_names = list(
+            self.evaluation_motion_dataset.body_names
+        )
         self.sim = IntegratedSimRuntime(
             self.robot_cfg,
             sim_dt=args.sim_dt,
@@ -922,6 +958,14 @@ class IntegratedSim2Sim:
     def _motion_frame(self, frame: int) -> MotionData:
         state_processor = self.state_processor
         return state_processor.motion_dataset.get_slice(
+            state_processor.motion_ids,
+            np.asarray([int(frame)], dtype=int),
+            np.asarray([0], dtype=int),
+        )
+
+    def _evaluation_motion_frame(self, frame: int) -> MotionData:
+        state_processor = self.state_processor
+        return self.evaluation_motion_dataset.get_slice(
             state_processor.motion_ids,
             np.asarray([int(frame)], dtype=int),
             np.asarray([0], dtype=int),
@@ -1014,13 +1058,12 @@ class IntegratedSim2Sim:
         )
 
     def _motion_root_state(self) -> tuple[np.ndarray, np.ndarray]:
-        state_processor = self.state_processor
         root_body_name = str(
             self.policy.policy_config.get("motion", {}).get("root_body_name", "pelvis")
         )
-        root_body_idx = state_processor.motion_body_names.index(root_body_name)
-        motion_t = int(state_processor.motion_t[0])
-        motion_data = self._motion_frame(motion_t)
+        root_body_idx = self.evaluation_motion_body_names.index(root_body_name)
+        motion_t = int(self.state_processor.motion_t[0])
+        motion_data = self._evaluation_motion_frame(motion_t)
         return (
             np.asarray(motion_data.body_pos_w[0, 0, root_body_idx], dtype=np.float32),
             np.asarray(motion_data.body_quat_w[0, 0, root_body_idx], dtype=np.float32),
@@ -1029,7 +1072,6 @@ class IntegratedSim2Sim:
     def _prepare_trajectory_body_layout(self) -> None:
         if self._trajectory_body_names is not None:
             return
-        state_processor = self.state_processor
         # Use the robot definition, rather than a controller-specific body list,
         # so every controller is evaluated on the same shared body set.
         configured_body_names = list(self.robot_cfg.body_names)
@@ -1043,11 +1085,13 @@ class IntegratedSim2Sim:
                 mujoco.mjtObj.mjOBJ_BODY,
                 body_name,
             )
-            if robot_body_id < 0 or body_name not in state_processor.motion_body_names:
+            if robot_body_id < 0 or body_name not in self.evaluation_motion_body_names:
                 continue
             body_names.append(body_name)
             robot_body_ids.append(int(robot_body_id))
-            motion_body_indices.append(state_processor.motion_body_names.index(body_name))
+            motion_body_indices.append(
+                self.evaluation_motion_body_names.index(body_name)
+            )
         if not body_names:
             raise ValueError("Could not resolve any shared robot/motion body names for trajectory output")
         self._trajectory_body_names = body_names
@@ -1067,13 +1111,18 @@ class IntegratedSim2Sim:
         robot_joint_qvel_adrs: list[int] = []
         motion_joint_indices: list[int] = []
         for robot_idx, joint_name in enumerate(self.robot_cfg.joint_names):
-            if robot_idx not in sim_joint_layout or joint_name not in state_processor.motion_joint_names:
+            if (
+                robot_idx not in sim_joint_layout
+                or joint_name not in self.evaluation_motion_joint_names
+            ):
                 continue
             qpos_addr, qvel_addr = sim_joint_layout[robot_idx]
             joint_names.append(str(joint_name))
             robot_joint_qpos_adrs.append(qpos_addr)
             robot_joint_qvel_adrs.append(qvel_addr)
-            motion_joint_indices.append(state_processor.motion_joint_names.index(joint_name))
+            motion_joint_indices.append(
+                self.evaluation_motion_joint_names.index(joint_name)
+            )
         if not joint_names:
             raise ValueError("Could not resolve any shared robot/motion joints for trajectory output")
         self._trajectory_joint_names = joint_names
@@ -1229,7 +1278,7 @@ class IntegratedSim2Sim:
         assert self._trajectory_robot_joint_qpos_adrs is not None
         assert self._trajectory_robot_joint_qvel_adrs is not None
         assert self._trajectory_motion_joint_indices is not None
-        motion_data = self._motion_frame(motion_t)
+        motion_data = self._evaluation_motion_frame(motion_t)
         robot_body_pos_w = np.asarray(
             self.sim.mj_data.xpos[self._trajectory_robot_body_ids],
             dtype=np.float32,

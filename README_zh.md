@@ -10,16 +10,22 @@ Full documentation: [https://egalahad.github.io/sim2real/](https://egalahad.gith
 
 ## Runtime Artifacts
 
-大文件不放在 git 里。先从共享的
-[sim2real artifacts](https://drive.google.com/drive/folders/1lrPyiiy7anyG3P4wHNIQQQlydboLPd9e)
-下载，把 `checkpoints/` 和 `third_party/` 放到 repo 根目录。
+大文件不放在 git 里。配置好 `bcecmd` 后，从 BCE BOS 恢复锁定的 G1
+reference 资产：
 
-目录结构和 onboard 依赖说明见 [Download Artifacts](./docs/artifacts.md)。
+```bash
+uv run python scripts/artifact_tool.py fetch --profile reference
+uv run python scripts/artifact_tool.py verify --profile reference
+```
+
+目录结构、benchmark/validation profile 和 onboard 依赖说明见
+[Download Artifacts](./docs/artifacts.md)。
 
 ## 快速开始
 
 ```bash
 uv sync
+uv run python scripts/artifact_tool.py fetch --profile reference
 ```
 
 运行离线动作跟踪（sim2sim）：
@@ -28,7 +34,8 @@ uv sync
 uv run sim2real/sim_env/base_sim.py --robot g1
 uv run sim2real/rl_policy/tracking.py \
   --robot g1 \
-  --policy_config checkpoints/mimic-lite/32x8192-huge/policy.yaml
+  --policy_config checkpoints/humanoid-gpt/policy.yaml \
+  --motion_path hf://elijahgalahad/any4hdmi-g1-lafan/motions/walk1_subject1.npz
 ```
 
 两个进程都启动后，在 policy 终端按 `]` 开始跟踪，然后打开 `base_sim.py` 打印出来的 mjviser URL。虚拟 gantry / elastic band 的开关和长度在 viewer UI 里调。
@@ -41,21 +48,18 @@ uv run sim2real/rl_policy/tracking.py \
 skills/adapt-policy-to-sim2real
 ```
 
-已经转好的 checkpoints 统一放在共享的
-[sim2real artifacts](https://drive.google.com/drive/folders/1lrPyiiy7anyG3P4wHNIQQQlydboLPd9e)
-目录里。
+已经转好的 checkpoint 二进制统一通过上面的 BCE BOS reference profile
+分发。
 
 目前已经支持的 adapted checkpoint：
 
 - BFM-Zero: `checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.yaml`
-- HEFT: `checkpoints/heft/pmg/policy.yaml`, `checkpoints/heft/compliance/policy.yaml`, `checkpoints/heft/wujs/policy.yaml`
+- HEFT: `checkpoints/heft/pmg/policy.yaml`, `checkpoints/heft/wujs/policy.yaml`
 - Humanoid-GPT: `checkpoints/humanoid-gpt/policy.yaml`
-- SONIC release G1: `checkpoints/sonic/release/g1/policy.yaml`
-- SONIC release SMPL: `checkpoints/sonic/release/smpl/policy.yaml`
 - SONIC low-latency G1: `checkpoints/sonic/low_latency/g1/policy.yaml`
-- SONIC low-latency SMPL: `checkpoints/sonic/low_latency/smpl/policy.yaml`
 - TeleopIT: `checkpoints/teleopit/policy.yaml`
 - TWIST2: `checkpoints/twist2/policy.yaml`
+- WXY WBC: `checkpoints/wxy-wbc/policy.yaml`
 
 安装到本机 Codex skills 目录：
 

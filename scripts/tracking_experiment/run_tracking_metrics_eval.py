@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 
-from compute_tracking_metrics import (
+from sim2real.metrics.tracking import (
     REQUIRED_TRAJECTORY_KEYS,
     compute_trajectory_metrics,
     metric_schema,
@@ -231,6 +231,7 @@ def _summary_only_outputs(
     metric_rows: list[dict[str, object]],
     run_rows: list[dict[str, object]],
 ) -> dict[str, object]:
+    _validate_metric_layouts(metric_rows)
     controller_groups: dict[str, list[dict[str, object]]] = {}
     config_groups: dict[str, list[dict[str, object]]] = {}
     for metric_row in metric_rows:
@@ -280,6 +281,16 @@ def _summary_only_outputs(
     return summary
 
 
+def _validate_metric_layouts(rows: list[dict[str, object]]) -> None:
+    for field in ("key_body_names", "end_effector_names", "joint_names"):
+        layouts = {str(row.get(field, "")) for row in rows}
+        if len(layouts) != 1:
+            raise RuntimeError(
+                f"Tracking metrics require one shared {field} layout, found "
+                f"{len(layouts)}: {sorted(layouts)}"
+            )
+
+
 def _add_policy_summary(
     result_json: Path,
     result_csv: Path,
@@ -288,6 +299,7 @@ def _add_policy_summary(
     payload = json.loads(result_json.read_text(encoding="utf-8"))
     with result_csv.open("r", encoding="utf-8", newline="") as f:
         result_rows = list(csv.DictReader(f))
+    _validate_metric_layouts(result_rows)
     if len(result_rows) != len(run_rows):
         raise RuntimeError(f"Expected {len(run_rows)} result rows, got {len(result_rows)}")
 

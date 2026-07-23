@@ -1,0 +1,4 @@
+{
+  "in_keys": ["proprioception", "motion_command"],
+  "out_keys": ["action", "std_param"]
+}

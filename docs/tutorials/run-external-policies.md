@@ -13,24 +13,23 @@ be interchanged by keeping the normal deploy command and only replacing
 
 ## Converted Checkpoints
 
-Download the shared
-[sim2real artifacts](https://drive.google.com/drive/folders/1lrPyiiy7anyG3P4wHNIQQQlydboLPd9e)
-folder first, then use any checkpoint path below as the `--policy-config`
-value.
+Restore the locked reference profile first, then use any checkpoint path below
+as the `--policy-config` value:
+
+```bash
+uv run python scripts/artifact_tool.py fetch --profile reference
+```
 
 | Policy | Checkpoint YAML | Notes |
 | --- | --- | --- |
 | HEFT PMG | `checkpoints/heft/pmg/policy.yaml` | Normal G1 motion stream. |
-| HEFT Compliance | `checkpoints/heft/compliance/policy.yaml` | Normal G1 motion stream; compliance flag is forced off in the observation. |
 | HEFT WUJS | `checkpoints/heft/wujs/policy.yaml` | Normal G1 motion stream; uses the standard HEFT observation contract and was trained on the WUJS dataset. |
 | TeleopIT | `checkpoints/teleopit/policy.yaml` | Normal G1 motion stream. |
 | Humanoid-GPT | `checkpoints/humanoid-gpt/policy.yaml` | Normal G1 motion stream. |
 | BFM-Zero | `checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.yaml` | Requires the checkpoint-specific MJCF override for ZMQ publishers. |
-| SONIC release G1 | `checkpoints/sonic/release/g1/policy.yaml` | Normal G1 motion stream. |
-| SONIC release SMPL | `checkpoints/sonic/release/smpl/policy.yaml` | Uses `motion_backend: smpl_zmq` and the SMPL publisher. |
 | SONIC low-latency G1 | `checkpoints/sonic/low_latency/g1/policy.yaml` | Normal G1 motion stream with the low-latency checkpoint. |
-| SONIC low-latency SMPL | `checkpoints/sonic/low_latency/smpl/policy.yaml` | Four-frame SMPL input horizon. |
 | TWIST2 | `checkpoints/twist2/policy.yaml` | Normal G1 motion stream. |
+| WXY-WBC | `checkpoints/wxy-wbc/policy.yaml` | Five-frame WXY observation history and normal G1 motion stream. |
 
 ```bash
 uv run sim2real/rl_policy/tracking.py \

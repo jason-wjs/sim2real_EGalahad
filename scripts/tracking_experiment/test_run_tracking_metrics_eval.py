@@ -15,6 +15,23 @@ import run_tracking_metrics_eval as evaluator
 
 
 class RunTrackingMetricsEvalTest(unittest.TestCase):
+    def test_rejects_noncomparable_metric_body_layouts(self) -> None:
+        rows = [
+            {
+                "key_body_names": "pelvis|left_toe_link",
+                "end_effector_names": "left_toe_link",
+                "joint_names": "left_hip_pitch_joint",
+            },
+            {
+                "key_body_names": "pelvis",
+                "end_effector_names": "",
+                "joint_names": "left_hip_pitch_joint",
+            },
+        ]
+
+        with self.assertRaisesRegex(RuntimeError, "shared key_body_names layout"):
+            evaluator._validate_metric_layouts(rows)
+
     def test_batch_eval_disables_hugging_face_network_by_default(self) -> None:
         with patch.dict(os.environ, {"HF_HUB_OFFLINE": "0"}, clear=False):
             evaluator._configure_asset_network(allow_network_assets=False)

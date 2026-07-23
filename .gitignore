@@ -1,6 +1,18 @@
 outputs*
 
-checkpoints
+# Keep policy contracts and provenance in Git; restore runtime binaries from
+# the versioned artifact lock.
+checkpoints/**
+!checkpoints/**/
+!checkpoints/**/*.yaml
+!checkpoints/**/*.yml
+!checkpoints/**/*.json
+!checkpoints/**/README.md
+!checkpoints/**/ADAPTATION_LOG.md
+!checkpoints/**/*.xml
+# The SIL-WBC matrix is G1-only; keep unrelated SONIC packages local.
+checkpoints/sonic/low_latency/smpl/**
+checkpoints/sonic/release/**
 .vscode
 stubs
 /legacy

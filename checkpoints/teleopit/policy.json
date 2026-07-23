@@ -1,0 +1,5 @@
+{
+  "in_keys": ["obs", "obs_history"],
+  "out_keys": ["action"],
+  "in_shapes": [[[1, 166]], [[1, 10, 166]]]
+}

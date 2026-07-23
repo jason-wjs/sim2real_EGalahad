@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "published_at": "2026-07-24",
+  "artifacts": [
+    {
+      "id": "heft-pmg-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/heft/pmg/policy.onnx",
+      "policy_config": "checkpoints/heft/pmg/policy.yaml",
+      "path": "checkpoints/heft/pmg/policy.onnx",
+      "bytes": 24324327,
+      "sha256": "192aaacc49ce066b85bdc9822bc35eca9ae21b8efc8371c089f7bc0077a86791"
+    },
+    {
+      "id": "heft-wujs-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/heft/wujs/policy.onnx",
+      "policy_config": "checkpoints/heft/wujs/policy.yaml",
+      "path": "checkpoints/heft/wujs/policy.onnx",
+      "bytes": 24327531,
+      "sha256": "03fca1754eb666b31d58b801b34c0f3d65b3315f7f065533f7ea8ac4480a5614"
+    },
+    {
+      "id": "humanoid-gpt-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/humanoid-gpt/policy.onnx",
+      "policy_config": "checkpoints/humanoid-gpt/policy.yaml",
+      "path": "checkpoints/humanoid-gpt/policy.onnx",
+      "bytes": 11688350,
+      "sha256": "cd3b36c1c5bbf0ad917640166c8c295164d5b7e7020b46eecd18b85c2b856eb5"
+    },
+    {
+      "id": "sonic-low-latency-g1-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/sonic/low_latency/g1/policy.onnx",
+      "policy_config": "checkpoints/sonic/low_latency/g1/policy.yaml",
+      "path": "checkpoints/sonic/low_latency/g1/policy.onnx",
+      "bytes": 195708562,
+      "sha256": "611f3ef80c29c12a9784cacc1cffe9d1008255cbb11643a8d334ba4d200767b1"
+    },
+    {
+      "id": "twist2-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/twist2/policy.onnx",
+      "policy_config": "checkpoints/twist2/policy.yaml",
+      "path": "checkpoints/twist2/policy.onnx",
+      "bytes": 3185219,
+      "sha256": "29c60ad0ac4d2fff46b86133f13fdf1bad2c77e401b1a89aa685b27175d86167"
+    },
+    {
+      "id": "teleopit-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/teleopit/policy.onnx",
+      "policy_config": "checkpoints/teleopit/policy.yaml",
+      "path": "checkpoints/teleopit/policy.onnx",
+      "bytes": 4235052,
+      "sha256": "3e305c9eb799f1f9a9d688524b016c38ca284ff14f282dd90d487a0feec7a45b"
+    },
+    {
+      "id": "bfm-zero-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/bfm-zero/exp_lafan40-100style_update_z10/policy.onnx",
+      "policy_config": "checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.yaml",
+      "path": "checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.onnx",
+      "bytes": 129283936,
+      "sha256": "c914eedc7afe9c7635e795c624219c43752812e8bac1b4dcbbcb4cba8ec5ddac"
+    },
+    {
+      "id": "wxy-wbc-policy",
+      "profiles": ["reference"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/wxy-wbc/policy.onnx",
+      "policy_config": "checkpoints/wxy-wbc/policy.yaml",
+      "path": "checkpoints/wxy-wbc/policy.onnx",
+      "bytes": 39424013,
+      "sha256": "b2907dd3b2c4a1f90d3782a9ea66e283c19e6f0523dba0b86d8fa06429ba49e9"
+    },
+    {
+      "id": "mimic-lite-32x8192-huge-policy",
+      "profiles": ["legacy"],
+      "kind": "file",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/checkpoints/v1/mimic-lite/32x8192-huge/policy.onnx",
+      "runtime_config": "checkpoints/mimic-lite/32x8192-huge/policy.yaml",
+      "path": "checkpoints/mimic-lite/32x8192-huge/policy.onnx",
+      "bytes": 12032897,
+      "sha256": "1a61b8d1aad10ce962de1a3e7fa4f399fb6271d20c68a36afadc4cf45aaa7d1f"
+    },
+    {
+      "id": "g1-runtime-a57ffbdf",
+      "profiles": ["reference"],
+      "kind": "tar.gz",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/runtime/v1/g1_xmls-a57ffbdf.tar.gz",
+      "cache_path": ".cache/artifacts/g1_xmls-a57ffbdf.tar.gz",
+      "bytes": 24859014,
+      "sha256": "b45c31d54e2a8ac9077dd9d01921301457e73a20e230cdd831c636fe4c020c83",
+      "extract_to": ".",
+      "tree_root": "third_party/prebuilt/g1_xmls",
+      "tree_files": 76,
+      "tree_bytes": 57772373,
+      "tree_sha256": "333a582ef3afe26bc778cccc7d495f004ce1c3d17ae6ec527a43a81ee33829cc"
+    },
+    {
+      "id": "bfm-zero-mjcf",
+      "profiles": ["reference"],
+      "kind": "tar.gz",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/runtime/v1/bfm-zero-mjcf.tar.gz",
+      "cache_path": ".cache/artifacts/bfm-zero-mjcf.tar.gz",
+      "bytes": 21808704,
+      "sha256": "817e0a9195863d7c5692661fa5c4167429529fbd686c27156f0917b591dcba04",
+      "extract_to": ".",
+      "tree_root": "checkpoints/bfm-zero/exp_lafan40-100style_update_z10/mjcf",
+      "tree_files": 63,
+      "tree_bytes": 49406945,
+      "tree_sha256": "cf3c3306022b57eca201e936d070562cabe3bad556addd7f494bedbe67be4a53"
+    },
+    {
+      "id": "tts-any4hdmi-v2",
+      "profiles": ["benchmark"],
+      "kind": "tar.gz",
+      "uri": "bos:/humanoid-wjs-new/sil_wbc/bench/v1/tts-any4hdmi-v2.tar.gz",
+      "cache_path": ".cache/artifacts/tts-any4hdmi-v2.tar.gz",
+      "bytes": 3306808,
+      "sha256": "5d332fd3ec4e2f123f382110329ab062af25538b37fba24c6c7378b4df74e931",
+      "extract_to": ".",
+      "tree_root": "outputs/any4hdmi_datasets/tts",
+      "tree_files": 6,
+      "tree_bytes": 3307004,
+      "tree_sha256": "527d9455bd321096d761456fb82aca1b9558b328c7daa15759f38d40ffba153d"
+    },
+    {
+      "id": "amass-corrected-any4hdmi",
+      "profiles": ["validation"],
+      "kind": "bos-prefix",
+      "uri": "bos:/humanoid-wjs-new/amass_corrected_any4hdmi/",
+      "path": "outputs/any4hdmi_datasets/amass_corrected_any4hdmi",
+      "tree_files": 12277,
+      "tree_bytes": 983018855
+    }
+  ]
+}

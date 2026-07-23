@@ -12,23 +12,23 @@ policy YAML。
 
 ## 已转换 Checkpoints
 
-先下载共享的
-[sim2real artifacts](https://drive.google.com/drive/folders/1lrPyiiy7anyG3P4wHNIQQQlydboLPd9e)
-目录，然后把下面任意 checkpoint 路径作为 `--policy-config` 使用。
+先恢复锁定的 reference profile，再把下面任意 checkpoint 路径作为
+`--policy-config` 使用：
+
+```bash
+uv run python scripts/artifact_tool.py fetch --profile reference
+```
 
 | Policy | Checkpoint YAML | Notes |
 | --- | --- | --- |
 | HEFT PMG | `checkpoints/heft/pmg/policy.yaml` | 正常 G1 motion stream。 |
-| HEFT Compliance | `checkpoints/heft/compliance/policy.yaml` | 正常 G1 motion stream；observation 里 compliance flag 固定为 off。 |
 | HEFT WUJS | `checkpoints/heft/wujs/policy.yaml` | 正常 G1 motion stream；使用标准 HEFT observation 契约，在 WUJS 数据集上训练。 |
 | TeleopIT | `checkpoints/teleopit/policy.yaml` | 正常 G1 motion stream。 |
 | Humanoid-GPT | `checkpoints/humanoid-gpt/policy.yaml` | 正常 G1 motion stream。 |
 | BFM-Zero | `checkpoints/bfm-zero/exp_lafan40-100style_update_z10/policy.yaml` | ZMQ publisher 需要传 checkpoint 对应的 MJCF override。 |
-| SONIC release G1 | `checkpoints/sonic/release/g1/policy.yaml` | 正常 G1 motion stream。 |
-| SONIC release SMPL | `checkpoints/sonic/release/smpl/policy.yaml` | 使用 `motion_backend: smpl_zmq` 和 SMPL publisher。 |
 | SONIC low-latency G1 | `checkpoints/sonic/low_latency/g1/policy.yaml` | 使用低延迟 checkpoint 的正常 G1 motion stream。 |
-| SONIC low-latency SMPL | `checkpoints/sonic/low_latency/smpl/policy.yaml` | 使用四帧 SMPL 输入窗口。 |
 | TWIST2 | `checkpoints/twist2/policy.yaml` | 正常 G1 motion stream。 |
+| WXY-WBC | `checkpoints/wxy-wbc/policy.yaml` | 使用五帧 WXY observation history 的正常 G1 motion stream。 |
 
 ```bash
 uv run sim2real/rl_policy/tracking.py \
